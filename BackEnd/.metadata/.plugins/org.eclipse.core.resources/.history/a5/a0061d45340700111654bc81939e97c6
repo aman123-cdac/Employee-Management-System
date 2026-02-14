@@ -1,0 +1,12 @@
+package com.example.demo.repository;
+
+public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
+
+    List<Attendance> findByEmployeeId(Long employeeId);
+
+    List<Attendance> findByEmployeeIdAndDateBetween(
+            Long employeeId,
+            LocalDate start,
+            LocalDate end
+    );
+}

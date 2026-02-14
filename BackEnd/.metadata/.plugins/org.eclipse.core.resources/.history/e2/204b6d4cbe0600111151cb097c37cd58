@@ -1,0 +1,25 @@
+package com.example.demo.service;
+
+package com.example.ems.service;
+
+import com.example.demo.dto.LoginRequest;
+import com.example.ems.entity.User;
+import com.example.ems.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AuthService {
+
+    private final UserRepository userRepository;
+
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public boolean login(LoginRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElse(null);
+
+        return user != null && user.getPassword().equals(request.getPassword());
+    }
+}

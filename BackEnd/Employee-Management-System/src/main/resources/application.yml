@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/ems_db
+    username: root
+    password: aman@123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: saurabhav2307586@gmail.com
+    password: uuti oyhd exnd dpwb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

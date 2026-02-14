@@ -1,0 +1,118 @@
+package com.example.demo.controller;
+
+import com.example.demo.entity.Employee;
+import com.example.demo.service.EmployeeService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/employees")
+@CrossOrigin(origins = "http://localhost:5173")
+public class EmployeeController {
+
+    private final EmployeeService service;
+
+    public EmployeeController(EmployeeService service) {
+        this.service = service;
+    }
+
+    // ✅ GET EMPLOYEES (ADMIN → all, USER → only self)
+    @GetMapping
+    public List<Employee> getEmployees(Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> role.equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return service.getAll();
+        }
+
+        // Normal user → only their own record
+        String username = authentication.getName();
+        return List.of(service.getByUsername(username));
+    }
+
+    // ✅ ADD EMPLOYEE (ADMIN ONLY)
+    @PostMapping
+    public Employee add(@RequestBody Employee emp, Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            throw new RuntimeException("Access Denied");
+        }
+
+        return service.add(emp);
+    }
+
+    // ✅ DELETE EMPLOYEE (ADMIN ONLY)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id, Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            throw new RuntimeException("Access Denied");
+        }
+
+        service.delete(id);
+    }
+
+    // ✅ GET BY ID (ADMIN OR SELF)
+    @GetMapping("/{id}")
+    public Employee getById(@PathVariable Long id, Authentication authentication) {
+
+        Employee employee = service.getById(id);
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return employee;
+        }
+
+        // Normal user → only allow if viewing own data
+        if (employee.getUsername().equals(authentication.getName())) {
+            return employee;
+        }
+
+        throw new RuntimeException("Access Denied");
+    }
+
+    // ✅ UPDATE (ADMIN ONLY)
+    @PutMapping("/{id}")
+    public Employee updateEmployee(@PathVariable Long id,
+                                   @RequestBody Employee emp,
+                                   Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            throw new RuntimeException("Access Denied");
+        }
+
+        return service.updateEmployee(id, emp);
+    }
+
+    // ✅ SEARCH (ADMIN ONLY)
+    @GetMapping("/search")
+    public List<Employee> searchEmployee(@RequestParam String keyword,
+                                         Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            throw new RuntimeException("Access Denied");
+        }
+
+        return service.searchByIdNameOrDepartment(keyword);
+    }
+}

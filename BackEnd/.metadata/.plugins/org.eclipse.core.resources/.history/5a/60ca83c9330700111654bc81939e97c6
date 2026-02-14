@@ -1,0 +1,24 @@
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String email;
+    private String department;
+
+    // 🔹 Additional Fields
+    private String phone;
+    private String address;
+    private String maritalStatus;
+    private String education;
+    private String companyRole; // Developer, Manager, HR etc
+
+    private Double salary;
+
+    private String username; // for login mapping
+
+    // getters & setters
+}

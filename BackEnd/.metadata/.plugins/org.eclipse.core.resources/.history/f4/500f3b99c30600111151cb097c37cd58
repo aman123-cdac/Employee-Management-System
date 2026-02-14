@@ -1,0 +1,50 @@
+package com.example.demo.service;
+
+
+
+import com.example.demo.entity.Employee;
+import com.example.demo.repository.EmployeeRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeService(EmployeeRepository repository) {
+        this.repository = repository;
+    }
+
+    public List<Employee> getAll() {
+        return repository.findAll();
+    }
+
+    public Employee add(Employee emp) {
+        return repository.save(emp);
+    }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
+    // ✅ GET BY ID
+    public Employee getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
+    // ✅ UPDATE
+    public Employee updateEmployee(Long id, Employee emp) {
+        Employee existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        existing.setName(emp.getName());
+        existing.setEmail(emp.getEmail());
+        existing.setDepartment(emp.getDepartment());
+
+        return repository.save(existing);
+    }
+}
+

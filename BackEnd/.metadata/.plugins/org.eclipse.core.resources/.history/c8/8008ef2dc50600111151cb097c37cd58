@@ -1,0 +1,83 @@
+package com.example.demo.service;
+
+
+
+import com.example.demo.entity.Employee;
+import com.example.demo.repository.EmployeeRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository repository;
+
+    public EmployeeService(EmployeeRepository repository) {
+        this.repository = repository;
+    }
+
+    public List<Employee> getAll() {
+        return repository.findAll();
+    }
+
+    public Employee add(Employee emp) {
+        return repository.save(emp);
+    }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
+    // ✅ GET BY ID
+    public Employee getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    }
+
+    // ✅ UPDATE
+    public Employee updateEmployee(Long id, Employee emp) {
+        Employee existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        existing.setName(emp.getName());
+        existing.setEmail(emp.getEmail());
+        existing.setDepartment(emp.getDepartment());
+
+        return repository.save(existing);
+    }
+    
+    public List<Employee> searchByName(String keyword) {
+        return repository.findByNameContainingIgnoreCase(keyword);
+    }
+
+    public List<Employee> searchByDepartment(String dept) {
+        return repository.findByDepartmentContainingIgnoreCase(dept);
+    }
+
+    public List<Employee> searchByIdOrName(String keyword) {
+
+        // If keyword is numeric → search by ID
+        if (keyword.matches("\\d+")) {
+            Long id = Long.parseLong(keyword);
+            return repository.findById(id)
+                    .map(List::of)
+                    .orElse(Collections.emptyList());
+        }
+
+        // Otherwise → search by name
+        return repository.findByNameContainingIgnoreCase(keyword);
+    }
+    
+    public List<Employee> searchByIdNameOrDepartment(String keyword) {
+
+        // 1️⃣ If keyword is numeric → search by ID
+        if (keyword.matches("\\d+")) {
+            Long id = Long.parseLong(keyword);
+            return repository.findById(id)
+                    .map(List::of)
+                    .orElse(Collections.emptyList());
+        }
+}
+

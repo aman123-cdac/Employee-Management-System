@@ -1,0 +1,33 @@
+package com.example.demo.service;
+
+
+
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.security.JwtUtil;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final JwtUtil jwtutil;
+
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public String login(LoginRequest request) {
+
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElse(null);
+
+        if (user != null && user.getPassword().equals(request.getPassword())) {
+            return jwtUtil.generateToken(user.getUsername());
+        }
+
+        throw new RuntimeException("Invalid credentials");
+    }
+}
