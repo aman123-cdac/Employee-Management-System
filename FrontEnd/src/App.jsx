@@ -13,6 +13,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import Profile from './pages/Profile';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -24,6 +26,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <ThemeProvider>
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
       <AuthProvider>
         <Router>
           <Routes>
